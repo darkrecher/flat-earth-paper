@@ -1,28 +1,20 @@
 XOR_KEY = b"obfuscation de la choucrouterie ultime !! 834513259765410 TONNERRE DE CHABRAQUE!!"
 
-def encode_one_file(filename_in, filename_out):
-    bin_data = open(filename_in, "rb").read()
+def decode(filename):
+    encoded_data = open(filename, "r").read()
+    bin_values = [
+        int(a + b, 16) for a, b in zip(encoded_data[::2], encoded_data[1::2])
+    ]
+    bin_data = bytes(bin_values)
     mul_key = len(bin_data) // len(XOR_KEY) + 1
     xored_ints = [
-        f"{a^b:02x}" for a, b in zip(bin_data, XOR_KEY * mul_key)
+        a ^ b for a, b in zip(bin_data, XOR_KEY * mul_key)
     ]
-    file_out = open(filename_out, "w")
-    file_out.write("".join(xored_ints))
-    file_out.close()
+    str_clear = bytes(xored_ints).decode("utf-8")
+    return str_clear
 
+python_code_graphql_server = decode("papers_fake_db_enc.txt")
+exec(python_code_graphql_server)
 
-def main():
-    encode_one_file("graphql_server.py", "graphql_server_enc.txt")
-    encode_one_file("papers_fake_db.py", "papers_fake_db_enc.txt")
-
-
-if __name__ == "__main__":
-    main()
-
-"""
-
-curl -X POST https://flat-earth-paper.onrender.com/graphql -H "Content-Type: application/json"   -d '{"query": "{ article(articleId: \"paper_001\") { title issuerId keywords } }"}'
-
-curl -X POST http://localhost:3000/graphql -H "Content-Type: application/json"   -d '{"query": "{ article(articleId: \"paper_001\") { title issuerId keywords } }"}'
-
-"""
+python_code_graphql_server = decode("graphql_server_enc.txt")
+exec(python_code_graphql_server)
